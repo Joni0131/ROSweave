@@ -71,4 +71,5 @@ void Configuration::setupHW()
     // It should be used to setup the hardware
     // For example, setting up the motor controller, sensors, etc.
     // This function is called once at the beginning of the program
+    // TODO: this is the next step
 }

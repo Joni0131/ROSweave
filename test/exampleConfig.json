@@ -1,0 +1,23 @@
+{
+    "wifi": {
+      "ssid": "hello",
+      "password": "tt"
+    },
+    "components": [
+      {
+        "type": "Servo",
+        "name": "SteeringServo",
+        "pins": [
+          {
+            "number": 18,
+            "name": "GPIO18",
+            "capability": "pwm"
+          }
+        ],
+        "config": {
+          "topicUpdateInterval": 1000,
+          "type": "SG_180"
+        }
+      }
+    ]
+  }
