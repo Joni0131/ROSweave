@@ -1,0 +1,310 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    line-height: 1.6;
+    color: #333;
+    background-color: #f5f5f5;
+}
+
+.container {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+header {
+    background-color: #2c3e50;
+    color: #ecf0f1;
+    padding: 15px;
+    text-align: center;
+    margin-bottom: 20px;
+    border-radius: 5px;
+}
+
+.main-content {
+    display: flex;
+    gap: 20px;
+}
+
+.sidebar {
+    width: 250px;
+    background-color: #fff;
+    border-radius: 5px;
+    padding: 15px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.main-area {
+    flex: 1;
+    background-color: #fff;
+    border-radius: 5px;
+    padding: 15px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.esp-image-container {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.esp-image {
+    max-width: 100%;
+    height: auto;
+}
+
+h2 {
+    margin-bottom: 15px;
+    border-bottom: 1px solid #ddd;
+    padding-bottom: 5px;
+}
+
+.component-list-container, .wifi-config {
+    margin-bottom: 30px;
+}
+
+#component-list li {
+    list-style: none;
+    padding: 8px 12px;
+    background-color: #3498db;
+    color: white;
+    margin-bottom: 5px;
+    border-radius: 3px;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+#component-list li:hover {
+    background-color: #2980b9;
+}
+
+.form-group {
+    margin-bottom: 15px;
+}
+
+label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: 500;
+}
+
+input[type="text"], input[type="password"], select {
+    width: 100%;
+    padding: 8px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+}
+
+.pin-categories {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 15px;
+}
+
+.pin-category {
+    flex: 1;
+    min-width: 150px;
+    background-color: #f8f9fa;
+    padding: 10px;
+    border-radius: 5px;
+}
+
+.pin-list {
+    list-style: none;
+    max-height: 150px;
+    overflow-y: auto;
+}
+
+.pin-list li {
+    padding: 5px 8px;
+    background-color: #eaf2f8;
+    margin-bottom: 3px;
+    border-radius: 3px;
+    cursor: pointer;
+    transition: background-color 0.2s;
+    font-size: 12px;
+}
+
+.pin-list li:hover {
+    background-color: #d5e8f8;
+}
+
+.pin-list li.selected {
+    background-color: #27ae60;
+    color: white;
+}
+
+.pin-list li.used {
+    background-color: #bdc3c7;
+    color: #7f8c8d;
+    text-decoration: line-through;
+    cursor: not-allowed;
+}
+
+/* Pin color indicators */
+.pin-list li[data-capability="gpio"] {
+    border-left: 3px solid var(--gpio-color, #46f27a);
+}
+
+.pin-list li[data-capability="adc1"] {
+    border-left: 3px solid var(--adc1-color, #f2ae46);
+}
+
+.pin-list li[data-capability="adc2"] {
+    border-left: 3px solid var(--adc2-color, #f2c146);
+}
+
+.pin-list li[data-capability="pwm"] {
+    border-left: 3px solid var(--pwm-color, #4686f2);
+}
+
+.pin-list li[data-capability="i2c"] {
+    border-left: 3px solid var(--i2c-color, #f246e1);
+}
+
+.pin-list li[data-capability="spi"] {
+    border-left: 3px solid var(--spi-color, #f24646);
+}
+
+.pin-list li[data-capability="uart"] {
+    border-left: 3px solid var(--uart-color, #9b46f2);
+}
+
+.pin-list li[data-capability="special"] {
+    border-left: 3px solid var(--special-color, #a1a1a1);
+}
+
+.device-actions {
+    margin-top: 20px;
+}
+
+#read-config-btn {
+    width: 100%;
+    background-color: #9b59b6;
+    margin-bottom: 10px;
+}
+
+#read-config-btn:hover {
+    background-color: #8e44ad;
+}
+
+.used-components-container {
+    margin-top: 20px;
+}
+
+.used-component {
+    background-color: #e8f4f8;
+    padding: 10px;
+    margin-bottom: 10px;
+    border-radius: 5px;
+    border-left: 4px solid #3498db;
+    position: relative;
+}
+
+.used-component.selected {
+    background-color: #d5e8f8;
+    border-left-color: #2980b9;
+}
+
+.used-component .component-pin-indicators {
+    display: flex;
+    margin-top: 5px;
+    gap: 5px;
+}
+
+.pin-indicator {
+    display: inline-block;
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    margin-right: 5px;
+}
+
+.used-component .pin-indicator[data-pin-type="gpio"] { background-color: var(--gpio-color, #46f27a); }
+.used-component .pin-indicator[data-pin-type="adc1"] { background-color: var(--adc1-color, #f2ae46); }
+.used-component .pin-indicator[data-pin-type="adc2"] { background-color: var(--adc2-color, #f2c146); }
+.used-component .pin-indicator[data-pin-type="pwm"] { background-color: var(--pwm-color, #4686f2); }
+.used-component .pin-indicator[data-pin-type="i2c"] { background-color: var(--i2c-color, #f246e1); }
+.used-component .pin-indicator[data-pin-type="spi"] { background-color: var(--spi-color, #f24646); }
+.used-component .pin-indicator[data-pin-type="uart"] { background-color: var(--uart-color, #9b46f2); }
+.used-component .pin-indicator[data-pin-type="special"] { background-color: var(--special-color, #a1a1a1); }
+
+.component-config {
+    background-color: #f8f9fa;
+    padding: 15px;
+    border-radius: 5px;
+    margin-top: 20px;
+}
+
+.json-output {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+#json-output {
+    flex: 1;
+    background-color: #2c3e50;
+    color: #ecf0f1;
+    padding: 15px;
+    border-radius: 5px;
+    overflow-y: auto;
+    font-family: monospace;
+    margin-top: 15px;
+    white-space: pre-wrap;
+}
+
+.button-container {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 10px;
+}
+
+button {
+    padding: 8px 16px;
+    background-color: #3498db;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+button:hover {
+    background-color: #2980b9;
+}
+
+#save-config-btn {
+    background-color: #27ae60;
+}
+
+#save-config-btn:hover {
+    background-color: #219651;
+}
+
+.component-actions {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 10px;
+}
+
+.remove-component {
+    background-color: #e74c3c;
+    padding: 5px 10px;
+    font-size: 12px;
+}
+
+.remove-component:hover {
+    background-color: #c0392b;
+}
+
+.config-field {
+    margin-bottom: 15px;
+}

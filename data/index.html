@@ -1,0 +1,118 @@
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ESP32-S3 Configuration Generator</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>ESP32-S3 Configuration Generator</h1>
+        </header>
+        
+        <div class="main-content">
+            <!-- Left sidebar -->
+            <div class="sidebar left-sidebar">
+                <div class="component-list-container">
+                    <h2>Available Components</h2>
+                    <ul id="component-list">
+                        <li data-component-type="Servo">Servo</li>
+                        <li data-component-type="IMU">IMU</li>
+                        <li data-component-type="LED">LED</li>
+                        <li data-component-type="Button">Button</li>
+                        <li data-component-type="Sensor">Sensor</li>
+                    </ul>
+                </div>
+                
+                <div class="wifi-config">
+                    <h2>WiFi Configuration</h2>
+                    <div class="form-group">
+                        <label for="wifi-ssid">SSID:</label>
+                        <input type="text" id="wifi-ssid" name="wifi-ssid">
+                    </div>
+                    <div class="form-group">
+                        <label for="wifi-password">Password:</label>
+                        <input type="password" id="wifi-password" name="wifi-password">
+                    </div>
+                </div>
+                
+                <div class="device-actions">
+                    <button id="read-config-btn">Read From Device</button>
+                </div>
+            </div>
+            
+            <!-- Main area -->
+            <div class="main-area">
+                <div class="esp-pins-container">
+                    <h2>ESP32-S3 Pins</h2>
+                    <div class="esp-image-container">
+                        <img src="esp32-pin.png" alt="ESP32-S3 Pinout" class="esp-image">
+                    </div>
+                    
+                    <div class="pin-categories">
+                        <div class="pin-category">
+                            <h3>GPIO Pins</h3>
+                            <ul id="gpio-pins" class="pin-list"></ul>
+                        </div>
+                        <div class="pin-category">
+                            <h3>ADC1 Pins</h3>
+                            <ul id="adc1-pins" class="pin-list"></ul>
+                        </div>
+                        <div class="pin-category">
+                            <h3>ADC2 Pins</h3>
+                            <ul id="adc2-pins" class="pin-list"></ul>
+                        </div>
+                        <div class="pin-category">
+                            <h3>PWM Pins</h3>
+                            <ul id="pwm-pins" class="pin-list"></ul>
+                        </div>
+                        <div class="pin-category">
+                            <h3>I2C Pins</h3>
+                            <ul id="i2c-pins" class="pin-list"></ul>
+                        </div>
+                        <div class="pin-category">
+                            <h3>SPI Pins</h3>
+                            <ul id="spi-pins" class="pin-list"></ul>
+                        </div>
+                        <div class="pin-category">
+                            <h3>UART Pins</h3>
+                            <ul id="uart-pins" class="pin-list"></ul>
+                        </div>
+                        <div class="pin-category">
+                            <h3>Special Pins</h3>
+                            <ul id="special-pins" class="pin-list"></ul>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="used-components-container">
+                    <h2>Used Components</h2>
+                    <div id="used-components-list"></div>
+                </div>
+                
+                <div id="component-config" class="component-config">
+                    <h2>Component Configuration</h2>
+                    <div id="config-form-container"></div>
+                </div>
+            </div>
+            
+            <!-- Right sidebar -->
+            <div class="sidebar right-sidebar">
+                <div class="json-output">
+                    <h2>Configuration</h2>
+                    <div class="button-container">
+                        <button id="generate-config-btn">Generate Config</button>
+                        <button id="save-config-btn">Save Config</button>
+                    </div>
+                    <pre id="json-output"></pre>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script src="pins.js"></script>
+    <script src="components.js"></script>
+    <script src="app.js"></script>
+</body>
+</html>
