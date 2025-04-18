@@ -6,7 +6,8 @@ GeneralTopic::GeneralTopic(char *name, size_t name_size, size_t msg_size, int ti
     : timeout(timeout), msg_type_support(msg_type_support), is_service(false)
 {
     this->name = (char *)malloc(name_size);
-    strlcpy(this->name, name, name_size);
+    strncpy(this->name, name, name_size - 1);
+    this->name[name_size - 1] = '\0'; // Ensure null termination
     this->msg = malloc(msg_size);
 }
 
@@ -14,7 +15,8 @@ GeneralTopic::GeneralTopic(char *name, size_t name_size, size_t req_size, size_t
     : timeout(timeout), srv_type_support(srv_type_support), is_service(true)
 {
     this->name = (char *)malloc(name_size);
-    strlcpy(this->name, name, name_size);
+    strncpy(this->name, name, name_size - 1);
+    this->name[name_size - 1] = '\0'; // Ensure null termination
     this->service.request = malloc(req_size);
     this->service.response = malloc(res_size);
 }

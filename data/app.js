@@ -185,7 +185,9 @@ function generateConfig() {
     const config = {
         wifi: {
             ssid: document.getElementById('wifi-ssid').value,
-            password: document.getElementById('wifi-password').value
+            password: document.getElementById('wifi-password').value,
+            ip: document.getElementById('wifi-client-ip').value,
+            port: document.getElementById('wifi-client-port').value
         },
         components: components.map(component => component.toJSON())
     };
@@ -199,7 +201,9 @@ function saveConfig() {
     const config = {
         wifi: {
             ssid: document.getElementById('wifi-ssid').value,
-            password: document.getElementById('wifi-password').value
+            password: document.getElementById('wifi-password').value,
+            ip: document.getElementById('wifi-client-ip').value,
+            port: document.getElementById('wifi-client-port').value
         },
         components: components.map(component => component.toJSON())
     };
@@ -236,6 +240,8 @@ function readConfigFromDevice() {
             if (data.wifi) {
                 document.getElementById('wifi-ssid').value = data.wifi.ssid || '';
                 document.getElementById('wifi-password').value = data.wifi.password || '';
+                document.getElementById('wifi-client-ip').value = data.wifi.ip || '';
+                document.getElementById('wifi-client-port').value = data.wifi.port || '';
             }
 
             // Populate components

@@ -1,7 +1,9 @@
 {
     "wifi": {
       "ssid": "hello",
-      "password": "tt"
+      "password": "tt",
+      "ip": "192.168.0.88",
+      "port": "8888"
     },
     "components": [
       {

@@ -6,9 +6,6 @@
 #include <WebServer.h>
 #include "SPIFFS.h"
 
-#include <vector>
-#include <FS.h> // Include SPIFFS filesystem library
-
 class MyWebServer
 {
 private:

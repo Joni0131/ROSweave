@@ -79,7 +79,7 @@ class Component {
 class ServoComponent extends Component {
     constructor(name) {
         super('Servo', name);
-        this.config.type = 'SG_180'; // Default type
+        this.config.type = 'SG90_180'; // Default type
     }
     
     getConfigHtml() {
@@ -88,8 +88,8 @@ class ServoComponent extends Component {
             <div class="config-field">
                 <label for="servo-type">Servo Type:</label>
                 <select id="servo-type">
-                    <option value="SG_180" ${this.config.type === 'SG_180' ? 'selected' : ''}>SG_180 (180°)</option>
-                    <option value="SG_360" ${this.config.type === 'SG_360' ? 'selected' : ''}>SG_360 (360°)</option>
+                    <option value="SG90_180" ${this.config.type === 'SG90_180' ? 'selected' : ''}>SG90_180 (180°)</option>
+                    <option value="SG90_360" ${this.config.type === 'SG90_360' ? 'selected' : ''}>SG90_360 (360°)</option>
                 </select>
             </div>
             <div class="config-field">

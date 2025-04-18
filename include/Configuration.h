@@ -3,12 +3,17 @@
 
 #include <Arduino.h>
 #include <micro_ros_platformio.h>
+#include <ArduinoJson.h>
+#include <map>
+#include <string>
+#include "ServoMotor.h"
 
 #include "GeneralRosDefinitions.h"
 #include "GeneralTopic.h"
 #include "MicroRosPublishers.h"
 #include "MicroRosServices.h"
 #include "MicroRosSubscribers.h"
+#include "SPIFFS.h"
 
 class Configuration
 {
@@ -26,6 +31,12 @@ private:
     MicroRosServices *services;
     MicroRosSubscribers *subscribers;
 
+    // Container to store component instances
+    std::map<std::string, void *> components;
+
+    // Container to store topics
+    std::map<std::string, GeneralTopic *> topics;
+
     void createNode(const char *node_name);
     void createSupport();
     void createAllocator();
@@ -33,6 +44,10 @@ private:
     void createServices();
     void createSubscribers();
     void createRos2Entities(const char *node_name);
+    void configWifi(char *ssid, char *password, IPAddress ip, uint16_t port);
+    bool initSPIFFS();
+    bool createComponent(const char *type, const char *name, JsonObject &component);
+    bool createComponentServo(const char *name, JsonObject &component);
 
 public:
     Configuration(const char *node_name, int spintime_ms, int max_publishers, int max_services, int max_subscribers);
@@ -41,6 +56,33 @@ public:
     void spin();
 
     void setupHW();
+
+    // Method to retrieve a component by name
+    template <typename T>
+    T *getComponent(const std::string &name)
+    {
+        if (components.find(name) != components.end())
+        {
+            return static_cast<T *>(components[name]);
+        }
+        return nullptr;
+    }
+
+    // Method to retrieve a topic by name
+    GeneralTopic *getTopic(const std::string &name)
+    {
+        if (topics.find(name) != topics.end())
+        {
+            return topics[name];
+        }
+        return nullptr;
+    }
+
+    // Method to add a topic
+    void addTopic(const std::string &name, GeneralTopic *topic)
+    {
+        topics[name] = topic;
+    }
 };
 
 #endif
