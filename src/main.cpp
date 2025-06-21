@@ -15,7 +15,7 @@ void handleWebServer() {
 void setup() {
   Serial.begin(115200);
   Serial.println("Starting up...");
-  pinMode(MODE_PIN, INPUT_PULLUP); // Set the mode pin as input with pull-up resistor
+  pinMode(MODE_PIN, INPUT); // Set the mode pin as input with pull-up resistor
   delay(1000); // Wait for a second to stabilize the input
   Serial.println("Checking mode pin...");
   if (digitalRead(MODE_PIN)) {
@@ -27,6 +27,8 @@ void setup() {
   } else {
     // Boot into operational mode
     config = new Configuration(NODE_NAME, SPINTIME_MS, MAX_PUBLISHER, MAX_SERVICES, MAX_SUBSCRIBER);
+    Serial.println("Booting into operational mode...");
+    delay(2000);
     config->setupHW();
     loopFunction = []() { config->spin(); }; // Assign operational mode to loopFunction
   }
