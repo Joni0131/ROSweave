@@ -7,10 +7,6 @@ Configuration::Configuration(const char *node_name, int spintime_ms, int max_pub
     this->max_publishers = max_publishers;
     this->max_services = max_services;
     this->max_subscribers = max_subscribers;
-
-    //FIXME: TODO: The problem why the esp crashes on the creation of the Configuration class is that the transport layer is not set before. Change the creation of the allocator and all subsequent ros nodes to be executed after the Hardware setup so the Wifi is configured correctly. Maybe restructure the HW setup because of possible dependencies.
-
-    createRos2Entities(node_name);
 }
 
 Configuration::~Configuration()
@@ -157,6 +153,10 @@ void Configuration::setupHW()
     }
     configWifi((char *)ssid, (char *)password, ip, port);
     Serial.println("Wifi configured.");
+
+    // Create ROS2 entities
+    createRos2Entities(this->node_name);
+    Serial.println("ROS2 entities created.");
 
     // Iterate over each component
     for (int i = 0; i < doc["components"].size(); i++)
