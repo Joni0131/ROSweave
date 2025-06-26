@@ -68,11 +68,12 @@ void Configuration::spin()
     this->publishers->spinPub();
     this->services->spinSrv();
     this->subscribers->spinSub();
+    delay(this->spintime_ms); // Delay to allow other tasks to run
 }
 
-void Configuration::configWifi(char *ssid, char *password, IPAddress ip, uint16_t port)
+void Configuration::configWifi(String ssid, String password, IPAddress ip, int port)
 {
-    set_microros_wifi_transports(ssid, password, ip, port);
+    set_microros_wifi_transports(ssid.begin(), password.begin(), ip, port);
     delay(2000);
 }
 
@@ -107,6 +108,8 @@ void Configuration::setupHW()
     {
         Serial.println("Failed to initialize SPIFFS.");
         return;
+    }else{
+        Serial.println("Initilized SPIFFS");
     }
 
     // Initilize the json document
@@ -116,13 +119,18 @@ void Configuration::setupHW()
     {
         Serial.println("Failed to open config file.");
         return;
+    }else{
+        Serial.println("Opened config file.");
     }
     size_t size = configFile.size();
     char *buffer = new char[size + 1];
+    Serial.println("Reading bytes...");
     configFile.readBytes(buffer, size);
     buffer[size] = '\0'; // Null-terminate the string
     configFile.close();
+    Serial.println("Closed File");
     DeserializationError error = deserializeJson(doc, buffer);
+    Serial.println("Deserialized Json.");
     delete[] buffer; // Free the buffer
     if (error)
     {
@@ -131,11 +139,17 @@ void Configuration::setupHW()
     }
 
     // Extract the wifi configuration
-    const char *ssid = doc["wifi"]["ssid"];
-    const char *password = doc["wifi"]["password"];
+    String ssid = doc["wifi"]["ssid"];
+    String password = doc["wifi"]["password"];
 
     // Extract the IP address from text to IPAddress
     const char *ip_str = doc["wifi"]["ip"];
+    Serial.print("Parsed ssid:");
+    Serial.println(ssid);
+    Serial.print("Parsed password:");
+    Serial.println(password);
+    Serial.print("Parsed ip_str:");
+    Serial.println(ip_str);
     IPAddress ip;
     if (sscanf(ip_str, "%hhu.%hhu.%hhu.%hhu", &ip[0], &ip[1], &ip[2], &ip[3]) != 4)
     {
@@ -143,15 +157,17 @@ void Configuration::setupHW()
         return;
     }
 
-    // Extract the port convert string to uint16_t
+    // Extract the port convert string to int
     const char *port_str = doc["wifi"]["port"];
-    uint16_t port = atoi(port_str);
+    Serial.print("Parsed port_str:");
+    Serial.println(port_str);
+    int port = atoi(port_str);
     if (port == 0)
     {
         Serial.println("Failed to parse port.");
         return;
     }
-    configWifi((char *)ssid, (char *)password, ip, port);
+    configWifi(ssid, password, ip, port); // Check order with old project again seems it is stuck here
     Serial.println("Wifi configured.");
 
     // Create ROS2 entities
@@ -195,57 +211,70 @@ bool Configuration::createComponent(const char *type, const char *name, JsonObje
 
 bool Configuration::createComponentServo(const char *name, JsonObject &component)
 {
+    Serial.printf("[createComponentServo] Called for name: %s\n", name);
     std::string targetTopicName = std::string(name) + "_target";
     std::string infoTopicName = std::string(name) + "_info";
+    Serial.printf("[createComponentServo] targetTopicName: %s, infoTopicName: %s\n", targetTopicName.c_str(), infoTopicName.c_str());
 
     // Extract the update interval
-    int updateInterval = atoi(component["config"]["topicUpdateInterval"]);
+    int updateInterval = component["config"]["topicUpdateInterval"].as<int>();
+    Serial.printf("[createComponentServo] updateInterval: %d\n", updateInterval);
 
     // Initialize topics
+    Serial.println("[createComponentServo] Initializing topics...");
     GeneralTopic *targetTopic = new GeneralTopic(
         const_cast<char *>(targetTopicName.c_str()), targetTopicName.size() + 1, sizeof(custom_interfaces__msg__ServoMotor), updateInterval, *rosidl_typesupport_c__get_message_type_support_handle__custom_interfaces__msg__ServoMotor());
     GeneralTopic *infoTopic = new GeneralTopic(
         const_cast<char *>(infoTopicName.c_str()), infoTopicName.size() + 1, sizeof(custom_interfaces__msg__ServoMotor), updateInterval, *rosidl_typesupport_c__get_message_type_support_handle__custom_interfaces__msg__ServoMotor());
+    Serial.println("[createComponentServo] Topics initialized.");
 
     // Add topics to the topics map
     addTopic(targetTopicName.c_str(), targetTopic);
     addTopic(infoTopicName.c_str(), infoTopic);
+    Serial.println("[createComponentServo] Topics added to map.");
 
     // Get the motor type
     const char *motorTypeStr = component["config"]["type"];
+    Serial.printf("[createComponentServo] motorTypeStr: %s\n", motorTypeStr);
     ServoMotorType motorType;
     if (strcmp(motorTypeStr, "SG90_180") == 0)
     {
         motorType = SG90_180;
+        Serial.println("[createComponentServo] Motor type: SG90_180");
     }
     else if (strcmp(motorTypeStr, "SG90_360") == 0)
     {
         motorType = SG90_360;
+        Serial.println("[createComponentServo] Motor type: SG90_360");
     }
     else
     {
-        Serial.printf("Unknown motor type: %s\n", motorTypeStr);
+        Serial.printf("[createComponentServo] Unknown motor type: %s\n", motorTypeStr);
         return false;
     }
 
     // Extract pin configuration
-    JsonArray pinArray = component["config"]["pins"];
+    JsonArray pinArray = component["pins"];
+    Serial.printf("[createComponentServo] pinArray size: %d\n", pinArray.size());
     std::vector<PinConfiguration> pin_config;
     for (int i = 0; i < pinArray.size(); i++)
     {
         PinConfiguration pin;
-        pin.pin = pinArray[i]["pin"];
+        pin.pin = pinArray[i]["number"];
         pin.mode = 0;
         pin.value = 0;
         pin_config.push_back(pin);
+        Serial.printf("[createComponentServo] Pin %d: pin=%d, mode=%d, value=%d\n", i, pin.pin, pin.mode, pin.value);
     }
 
     // Create and initialize the ServoMotor
+    Serial.println("[createComponentServo] Creating ServoMotor instance...");
     ServoMotor *servo = new ServoMotor(&pin_config, targetTopic, infoTopic, this->publishers, this->subscribers, this->services, motorType);
-    Serial.printf("ServoMotor '%s' initialized.\n", name);
+    Serial.printf("[createComponentServo] ServoMotor '%s' initialized.\n", name);
 
     // Store the instance in the components map
     components[name] = servo;
+    Serial.printf("[createComponentServo] ServoMotor '%s' stored in components map.\n", name);
 
     return true;
 }

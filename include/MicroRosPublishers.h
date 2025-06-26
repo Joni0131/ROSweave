@@ -29,6 +29,10 @@ private:
     const int timeout_ms = 1000;
 
     void createPublisher(rosidl_message_type_support_t type_support, char *topic_name);
+
+    /// @brief Create a timer
+    /// @param time_out Timeout duration in milliseconds
+    /// @param timer_callback Callback function to be called on timer expiration
     void createTimer(int time_out, std::function<void(rcl_timer_t *,int64_t)> timer_callback);
     void createExecutor();
     void addPublisherToExecutor(int id);

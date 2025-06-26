@@ -44,7 +44,7 @@ private:
     void createServices();
     void createSubscribers();
     void createRos2Entities(const char *node_name);
-    void configWifi(char *ssid, char *password, IPAddress ip, uint16_t port);
+    void configWifi(String ssid, String password, IPAddress ip, int port);
     bool initSPIFFS();
     bool createComponent(const char *type, const char *name, JsonObject &component);
     bool createComponentServo(const char *name, JsonObject &component);

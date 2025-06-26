@@ -8,11 +8,11 @@
     "components": [
       {
         "type": "Servo",
-        "name": "SteeringServo",
+        "name": "Servo?54",
         "pins": [
           {
-            "number": 18,
-            "name": "GPIO18",
+            "number": 4,
+            "name": "GPIO4",
             "capability": "pwm"
           }
         ],

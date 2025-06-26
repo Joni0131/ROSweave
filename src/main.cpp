@@ -32,6 +32,7 @@ void setup() {
     config->setupHW();
     loopFunction = []() { config->spin(); }; // Assign operational mode to loopFunction
   }
+  delay(1000); // Allow some time for the setup to complete
 }
 
 void loop() {
