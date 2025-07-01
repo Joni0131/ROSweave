@@ -91,7 +91,6 @@ void MicroRosPublishers::addPublisherToExecutor(int id)
 
 rcl_publisher_t *MicroRosPublishers::getPublisher(int id)
 {
-    Serial.printf("[MicroRosPublishers] Getting publisher with id: %d\n", id);
     return &(this->publishers[id]);
 }
 
@@ -102,18 +101,14 @@ void MicroRosPublishers::spinPub()
 
 int MicroRosPublishers::getPublisherCount()
 {
-    Serial.printf("[MicroRosPublishers] Current publisher count: %d\n", this->current_publishers);
     return this->current_publishers;
 }
 
 void MicroRosPublishers::timerCallbackWrapper(rcl_timer_t *timer, int64_t last_call_time)
 {
-    Serial.println("[MicroRosPublishers] timerCallbackWrapper called");
     if (timer_callbacks.find(timer) != timer_callbacks.end())
     {
-        Serial.println("[MicroRosPublishers] Found timer callback, calling...");
         timer_callbacks[timer](timer, last_call_time);
-        Serial.println("[MicroRosPublishers] Timer callback executed");
     }
     else
     {

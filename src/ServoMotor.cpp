@@ -91,7 +91,7 @@ void ServoMotor::infoCallback(rcl_timer_t *timer, int64_t last_call_time)
     custom_interfaces__msg__ServoMotor *msg = (custom_interfaces__msg__ServoMotor *)this->infoTopic->getMsg();
     msg->header.stamp.sec = (int32_t)(time_ns / 1000000000);
     msg->header.stamp.nanosec = (uint32_t)(time_ns % 1000000000);
-    msg->angle = this->myServo.read();
+    msg->angle = (int32_t)this->myServo.read();
     // No need to call setMsg if getMsg() returns the buffer used for publishing
     RCSOFTCHECK(rcl_publish(this->publishers->getPublisher(this->infoTopic->getID()), msg, NULL));
 }
