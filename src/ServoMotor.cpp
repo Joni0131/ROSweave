@@ -26,17 +26,17 @@ ServoMotor::~ServoMotor()
 }
 
 void ServoMotor::initTopics(){
-    custom_interfaces__msg__ServoMotor infoTopic;
-    custom_interfaces__msg__ServoMotor targetTopic;
+    custom_interfaces__msg__ServoMotor *infoTopic;
+    custom_interfaces__msg__ServoMotor *targetTopic;
 
-    infoTopic = *((custom_interfaces__msg__ServoMotor *)this->targetTopic->getMsg());
-    targetTopic = *((custom_interfaces__msg__ServoMotor *)this->infoTopic->getMsg());
+    infoTopic = (custom_interfaces__msg__ServoMotor *)this->targetTopic->getMsg();
+    targetTopic = (custom_interfaces__msg__ServoMotor *)this->infoTopic->getMsg();
 
-    infoTopic.angle = 0;
-    targetTopic.angle = 0;
+    infoTopic->angle = 0;
+    targetTopic->angle = 0;
 
-    this->infoTopic->setMsg(&infoTopic);
-    this->targetTopic->setMsg(&targetTopic);
+    this->infoTopic->setMsg(infoTopic);
+    this->targetTopic->setMsg(targetTopic);
 }
 
 void ServoMotor::registerCallbacks()
@@ -73,7 +73,6 @@ void ServoMotor::targetCallback(const void *msgin)
 
 void ServoMotor::infoCallback(rcl_timer_t *timer, int64_t last_call_time)
 {
-    Serial.println("ServoMotor infoCallback called");
     if (!this->publishers) {
         Serial.println("publishers pointer is null!");
         return;
@@ -83,16 +82,13 @@ void ServoMotor::infoCallback(rcl_timer_t *timer, int64_t last_call_time)
         return;
     }
     int id = this->infoTopic->getID();
-    Serial.printf("infoTopic ID: %d\n", id);
-    Serial.printf("publishers vector size: %d\n", this->publishers->getPublisherCount());
     if (id < 0 || id >= this->publishers->getPublisherCount()) {
         Serial.println("Invalid publisher ID!");
         return;
     }
     // Get corrected epoch time 
     int64_t time_ns = rmw_uros_epoch_nanos();
-    Serial.printf("Current time in nanoseconds: %lld\n", time_ns);
-    auto *msg = (custom_interfaces__msg__ServoMotor *)this->infoTopic->getMsg();
+    custom_interfaces__msg__ServoMotor *msg = (custom_interfaces__msg__ServoMotor *)this->infoTopic->getMsg();
     msg->header.stamp.sec = (int32_t)(time_ns / 1000000000);
     msg->header.stamp.nanosec = (uint32_t)(time_ns % 1000000000);
     msg->angle = this->myServo.read();
