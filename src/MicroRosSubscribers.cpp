@@ -16,14 +16,14 @@ MicroRosSubscribers::MicroRosSubscribers(int max_subscribers, rcl_node_t *node, 
 MicroRosSubscribers::~MicroRosSubscribers()
 {
     Serial.println("[MicroRosSubscribers] Destructor called");
-    RCCHECK(rclc_executor_fini(&executor_sub));
+    RCCHECK(rclc_executor_fini(&(this->executor_sub)));
     Serial.println("[MicroRosSubscribers] Executor finalized");
 }
 
 void MicroRosSubscribers::createExecutor()
 {
     Serial.println("[MicroRosSubscribers] Initializing executor...");
-    RCCHECK(rclc_executor_init(&executor_sub, &(this->support->context), this->max_subscribers, this->allocator));
+    RCCHECK(rclc_executor_init(&(this->executor_sub), &(this->support->context), this->max_subscribers, this->allocator));
     Serial.println("[MicroRosSubscribers] Executor initialized");
 }
 
@@ -31,12 +31,13 @@ void MicroRosSubscribers::addSubscriberToExecutor(int id, GeneralTopic *topic, r
 {
     Serial.printf("[MicroRosSubscribers] Adding subscriber to executor, id: %d, topic: %s\n", id, topic->getName());
     Serial.printf("[MicroRosSubscribers] Callback address: %p, Context: %p\n", (void*)callback, context);
-    RCCHECK(rclc_executor_add_subscription_with_context(&executor_sub, getSubscriber(id), topic->getMsg(), callback, context, executerHandle));
+    RCCHECK(rclc_executor_add_subscription_with_context(&(this->executor_sub), this->getSubscriber(id), topic->getMsg(), callback, context, executerHandle));
     Serial.println("[MicroRosSubscribers] Subscriber added to executor");
 }
 
 int MicroRosSubscribers::registerSubscriber(GeneralTopic *topic, rclc_executor_handle_invocation_t executerHandle, rclc_subscription_callback_with_context_t callback, void *context)
 {
+    //fix somwhere heer
     Serial.printf("[MicroRosSubscribers] Registering subscriber for topic: %s\n", topic->getName());
     if (current_subscriber >= max_subscribers)
     {
@@ -54,9 +55,8 @@ int MicroRosSubscribers::registerSubscriber(GeneralTopic *topic, rclc_executor_h
 void MicroRosSubscribers::createSubscriber(rosidl_message_type_support_t type_support, char *topic_name)
 {
     Serial.printf("[MicroRosSubscribers] Creating subscriber for topic: %s\n", topic_name);
-    rcl_subscription_t sub = rcl_get_zero_initialized_subscription();
-    RCCHECK(rclc_subscription_init_default(&sub, node, &type_support, topic_name));
-    subscribers.push_back(sub);
+    this->subscribers[current_subscriber] = rcl_get_zero_initialized_subscription();
+    RCCHECK(rclc_subscription_init_default(&subscribers[current_subscriber], node, &type_support, topic_name));
     Serial.println("[MicroRosSubscribers] Subscriber created and added to vector");
 }
 
@@ -68,7 +68,7 @@ rcl_subscription_t *MicroRosSubscribers::getSubscriber(int id)
 
 void MicroRosSubscribers::spinSub()
 {
-    RCSOFTCHECK(rclc_executor_spin_some(&executor_sub, RCL_MS_TO_NS(this->spintime_ms)));
+    RCSOFTCHECK(rclc_executor_spin_some(&(this->executor_sub), RCL_MS_TO_NS(this->spintime_ms)));
 }
 
 int MicroRosSubscribers::getSubscriberCount()

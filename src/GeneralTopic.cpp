@@ -77,11 +77,6 @@ void GeneralTopic::setID(int id)
     this->id = id;
 }
 
-void GeneralTopic::setMsg(void *msg)
-{
-    this->msg = msg;
-}
-
 void GeneralTopic::setService(void *request, void *response)
 {
     this->service.request = request;

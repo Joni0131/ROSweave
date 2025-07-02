@@ -35,15 +35,12 @@ void ServoMotor::initTopics(){
     infoTopic->angle = 0;
     targetTopic->angle = 0;
 
-    this->infoTopic->setMsg(infoTopic);
-    this->targetTopic->setMsg(targetTopic);
 }
 
 void ServoMotor::registerCallbacks()
 {
     Serial.println("[ServoMotor] Registering publisher and subscriber callbacks");
     this->publishers->registerPublisher(this->infoTopic,[this](rcl_timer_t *timer, uint64_t currentTime) {
-        Serial.println("[ServoMotor] Publisher timer callback triggered");
         this->infoCallback(timer,currentTime);
     });
     Serial.println("[ServoMotor] Registering subscriber callback");
@@ -53,17 +50,14 @@ void ServoMotor::registerCallbacks()
 
 void ServoMotor::targetCallback(const void *msgin)
 {
-    Serial.println("[ServoMotor] targetCallback called");
+    //Debug this
     custom_interfaces__msg__ServoMotor msg = *((custom_interfaces__msg__ServoMotor *)msgin);
-    Serial.printf("[ServoMotor] Received angle: %d\n", msg.angle);
     if (msg.angle >= this->min_angle && msg.angle <= this->max_angle) {
         // update target topic
-        custom_interfaces__msg__ServoMotor targetMsg = *((custom_interfaces__msg__ServoMotor *)this->targetTopic->getMsg());
-        targetMsg.header.stamp.sec = msg.header.stamp.sec;
-        targetMsg.header.stamp.nanosec = msg.header.stamp.nanosec;
-        targetMsg.angle = msg.angle;
-        this->targetTopic->setMsg(&targetMsg);
-        Serial.printf("[ServoMotor] Setting servo angle to: %d\n", msg.angle);
+        custom_interfaces__msg__ServoMotor* targetMsg = ((custom_interfaces__msg__ServoMotor *)this->targetTopic->getMsg());
+        targetMsg->header.stamp.sec = msg.header.stamp.sec;
+        targetMsg->header.stamp.nanosec = msg.header.stamp.nanosec;
+        targetMsg->angle = msg.angle;
         // Set the servo angle
         this->myServo.write(msg.angle);
     } else {
@@ -73,19 +67,6 @@ void ServoMotor::targetCallback(const void *msgin)
 
 void ServoMotor::infoCallback(rcl_timer_t *timer, int64_t last_call_time)
 {
-    if (!this->publishers) {
-        Serial.println("publishers pointer is null!");
-        return;
-    }
-    if (!this->infoTopic) {
-        Serial.println("infoTopic pointer is null!");
-        return;
-    }
-    int id = this->infoTopic->getID();
-    if (id < 0 || id >= this->publishers->getPublisherCount()) {
-        Serial.println("Invalid publisher ID!");
-        return;
-    }
     // Get corrected epoch time 
     int64_t time_ns = rmw_uros_epoch_nanos();
     custom_interfaces__msg__ServoMotor *msg = (custom_interfaces__msg__ServoMotor *)this->infoTopic->getMsg();

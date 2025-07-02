@@ -37,7 +37,6 @@ public:
     bool isService();
 
     void setID(int id);
-    void setMsg(void *msg);
     void setService(void *request, void *response);
 };
 
