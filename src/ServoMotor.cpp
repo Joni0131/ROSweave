@@ -77,6 +77,69 @@ void ServoMotor::infoCallback(rcl_timer_t *timer, int64_t last_call_time)
     RCSOFTCHECK(rcl_publish(this->publishers->getPublisher(this->infoTopic->getID()), msg, NULL));
 }
 
+ServoMotor::ServoMotorFactoryResult ServoMotor::createFromJsonServo(const char *name, JsonObject &component, MicroRosPublishers *publishers, MicroRosSubscribers *subscribers, MicroRosServices *services)
+{
+    ServoMotorFactoryResult result = {nullptr, nullptr, nullptr};
+
+    Serial.printf("[createComponentServo] Called for name: %s\n", name);
+    std::string targetTopicName = std::string(name) + "_target";
+    std::string infoTopicName = std::string(name) + "_info";
+    Serial.printf("[createComponentServo] targetTopicName: %s, infoTopicName: %s\n", targetTopicName.c_str(), infoTopicName.c_str());
+
+    // Extract the update interval
+    int updateInterval = component["config"]["topicUpdateInterval"].as<int>();
+    Serial.printf("[createComponentServo] updateInterval: %d\n", updateInterval);
+
+    // Initialize topics
+    Serial.println("[createComponentServo] Initializing topics...");
+    result.targetTopic = new GeneralTopic(
+        const_cast<char *>(targetTopicName.c_str()), targetTopicName.size() + 1, sizeof(custom_interfaces__msg__ServoMotor), updateInterval, *rosidl_typesupport_c__get_message_type_support_handle__custom_interfaces__msg__ServoMotor());
+    result.infoTopic = new GeneralTopic(
+        const_cast<char *>(infoTopicName.c_str()), infoTopicName.size() + 1, sizeof(custom_interfaces__msg__ServoMotor), updateInterval, *rosidl_typesupport_c__get_message_type_support_handle__custom_interfaces__msg__ServoMotor());
+    Serial.println("[createComponentServo] Topics initialized.");
+
+    // Get the motor type
+    const char *motorTypeStr = component["config"]["type"];
+    Serial.printf("[createComponentServo] motorTypeStr: %s\n", motorTypeStr);
+    ServoMotorType motorType;
+    if (strcmp(motorTypeStr, "SG90_180") == 0)
+    {
+        motorType = SG90_180;
+        Serial.println("[createComponentServo] Motor type: SG90_180");
+    }
+    else if (strcmp(motorTypeStr, "SG90_360") == 0)
+    {
+        motorType = SG90_360;
+        Serial.println("[createComponentServo] Motor type: SG90_360");
+    }
+    else
+    {
+        Serial.printf("[createComponentServo] Unknown motor type: %s\n", motorTypeStr);
+        return result;
+    }
+
+    // Extract pin configuration
+    JsonArray pinArray = component["pins"];
+    Serial.printf("[createComponentServo] pinArray size: %d\n", pinArray.size());
+    std::vector<PinConfiguration> pin_config;
+    for (int i = 0; i < pinArray.size(); i++)
+    {
+        PinConfiguration pin;
+        pin.pin = pinArray[i]["number"];
+        pin.mode = 0;
+        pin.value = 0;
+        pin_config.push_back(pin);
+        Serial.printf("[createComponentServo] Pin %d: pin=%d, mode=%d, value=%d\n", i, pin.pin, pin.mode, pin.value);
+    }
+
+    // Create and initialize the ServoMotor
+    Serial.println("[createComponentServo] Creating ServoMotor instance...");
+    result.servo = new ServoMotor(&pin_config, result.targetTopic, result.infoTopic, publishers, subscribers, services, motorType);
+    Serial.printf("[createComponentServo] ServoMotor '%s' initialized.\n", name);
+
+    return result;
+}
+
 void SERVOMOTOR_targetCallbackWrapper(const void *msgin, void *motor)
 {
     ((ServoMotor *)motor)->targetCallback(msgin);

@@ -83,6 +83,12 @@ public:
     {
         topics[name] = topic;
     }
+
+    // Method to add a component
+    void addComponent(const std::string &name, void *component)
+    {
+        components[name] = component;
+    }
 };
 
 #endif

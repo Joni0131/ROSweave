@@ -211,70 +211,15 @@ bool Configuration::createComponent(const char *type, const char *name, JsonObje
 
 bool Configuration::createComponentServo(const char *name, JsonObject &component)
 {
-    Serial.printf("[createComponentServo] Called for name: %s\n", name);
-    std::string targetTopicName = std::string(name) + "_target";
-    std::string infoTopicName = std::string(name) + "_info";
-    Serial.printf("[createComponentServo] targetTopicName: %s, infoTopicName: %s\n", targetTopicName.c_str(), infoTopicName.c_str());
-
-    // Extract the update interval
-    int updateInterval = component["config"]["topicUpdateInterval"].as<int>();
-    Serial.printf("[createComponentServo] updateInterval: %d\n", updateInterval);
-
-    // Initialize topics
-    Serial.println("[createComponentServo] Initializing topics...");
-    GeneralTopic *targetTopic = new GeneralTopic(
-        const_cast<char *>(targetTopicName.c_str()), targetTopicName.size() + 1, sizeof(custom_interfaces__msg__ServoMotor), updateInterval, *rosidl_typesupport_c__get_message_type_support_handle__custom_interfaces__msg__ServoMotor());
-    GeneralTopic *infoTopic = new GeneralTopic(
-        const_cast<char *>(infoTopicName.c_str()), infoTopicName.size() + 1, sizeof(custom_interfaces__msg__ServoMotor), updateInterval, *rosidl_typesupport_c__get_message_type_support_handle__custom_interfaces__msg__ServoMotor());
-    Serial.println("[createComponentServo] Topics initialized.");
-
-    // Add topics to the topics map
-    addTopic(targetTopicName.c_str(), targetTopic);
-    addTopic(infoTopicName.c_str(), infoTopic);
-    Serial.println("[createComponentServo] Topics added to map.");
-
-    // Get the motor type
-    const char *motorTypeStr = component["config"]["type"];
-    Serial.printf("[createComponentServo] motorTypeStr: %s\n", motorTypeStr);
-    ServoMotorType motorType;
-    if (strcmp(motorTypeStr, "SG90_180") == 0)
+    ServoMotor::ServoMotorFactoryResult servoResult = ServoMotor::createFromJsonServo(name, component, this->publishers, this->subscribers, this->services);
+    if (servoResult.servo == nullptr || servoResult.targetTopic == nullptr || servoResult.infoTopic == nullptr)
     {
-        motorType = SG90_180;
-        Serial.println("[createComponentServo] Motor type: SG90_180");
-    }
-    else if (strcmp(motorTypeStr, "SG90_360") == 0)
-    {
-        motorType = SG90_360;
-        Serial.println("[createComponentServo] Motor type: SG90_360");
-    }
-    else
-    {
-        Serial.printf("[createComponentServo] Unknown motor type: %s\n", motorTypeStr);
+        Serial.printf("[createComponentServo] Failed to create ServoMotor '%s'.\n", name);
         return false;
     }
 
-    // Extract pin configuration
-    JsonArray pinArray = component["pins"];
-    Serial.printf("[createComponentServo] pinArray size: %d\n", pinArray.size());
-    std::vector<PinConfiguration> pin_config;
-    for (int i = 0; i < pinArray.size(); i++)
-    {
-        PinConfiguration pin;
-        pin.pin = pinArray[i]["number"];
-        pin.mode = 0;
-        pin.value = 0;
-        pin_config.push_back(pin);
-        Serial.printf("[createComponentServo] Pin %d: pin=%d, mode=%d, value=%d\n", i, pin.pin, pin.mode, pin.value);
-    }
-
-    // Create and initialize the ServoMotor
-    Serial.println("[createComponentServo] Creating ServoMotor instance...");
-    ServoMotor *servo = new ServoMotor(&pin_config, targetTopic, infoTopic, this->publishers, this->subscribers, this->services, motorType);
-    Serial.printf("[createComponentServo] ServoMotor '%s' initialized.\n", name);
-
-    // Store the instance in the components map
-    components[name] = servo;
-    Serial.printf("[createComponentServo] ServoMotor '%s' stored in components map.\n", name);
-
+    this->addComponent(name, servoResult.servo);
+    this->addTopic(servoResult.targetTopic->getName(), servoResult.targetTopic);
+    this->addTopic(servoResult.infoTopic->getName(), servoResult.infoTopic);
     return true;
 }
