@@ -1,0 +1,24 @@
+# Intended Components List
+
+- [ ] Motor
+  - [x] Servo
+    - [x] 180°
+    - [ ] 360°
+  - [ ] Stepper
+    - [ ] DRV8825
+  - [ ] BLDC
+    - [ ] SimpleFOC
+  - [ ]DC
+    - [ ] L293D
+- [ ] LED 
+  - [ ] PWM
+- [ ] GPS
+  - [ ] M100 MINI
+- [ ] ToF
+  - [ ] VL53L/1XV2
+- [ ] IMU
+  - [ ] GY-BNO055
+  - [ ] GY-9250
+  - [ ] ITG/MPU6050
+- [ ] Ultrasonic
+  - [ ] HC-SR04
