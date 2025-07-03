@@ -16,7 +16,7 @@
 
 # ROSweave
 
-ROSweave provides a in the field configuration of a esp32 microros node with predefined connected components.
+ROSweave provides an in the field configuration of a esp32 micro-ros node with predefined connected components.
 
 # Origin
 
