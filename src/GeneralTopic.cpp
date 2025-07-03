@@ -52,9 +52,9 @@ void* GeneralTopic::getMsg()
     return this->msg;
 }
 
-srv_msg GeneralTopic::getService()
+srv_msg* GeneralTopic::getService()
 {
-    return this->service;
+    return &this->service;
 }
 
 rosidl_message_type_support_t GeneralTopic::getMsgTypeSupport()
@@ -75,10 +75,4 @@ bool GeneralTopic::isService()
 void GeneralTopic::setID(int id)
 {
     this->id = id;
-}
-
-void GeneralTopic::setService(void *request, void *response)
-{
-    this->service.request = request;
-    this->service.response = response;
 }

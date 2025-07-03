@@ -26,13 +26,13 @@ private:
 
     void createService(rosidl_service_type_support_t type_support, char *topic_name);
     void createExecutor();
-    void addServiceToExecutor(int id, GeneralTopic *topic, rclc_service_callback_t callback);
+    void addServiceToExecutor(int id, GeneralTopic *topic, rclc_service_callback_with_context_t callback, void *context);
 
 public:
     MicroRosServices(int max_services, rcl_node_t *node, rclc_support_t *support, rcl_allocator_t *allocator, int spintime_ms);
     ~MicroRosServices();
 
-    int registerService(GeneralTopic *topic, rclc_service_callback_t callback);
+    int registerService(GeneralTopic *topic, rclc_service_callback_with_context_t callback, void *context);
     rcl_service_t *getService(int id);
     void spinSrv();
 

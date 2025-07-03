@@ -13,6 +13,7 @@ find_package(std_msgs REQUIRED)
 
 rosidl_generate_interfaces(${PROJECT_NAME}
   "msg/ServoMotor.msg"
+  "srv/ServiceTest.srv"
   DEPENDENCIES std_msgs
 )
 if(BUILD_TESTING)

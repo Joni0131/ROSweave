@@ -31,13 +31,12 @@ public:
     int getTimeout();
     char* getName();
     void* getMsg();
-    srv_msg getService();
+    srv_msg* getService();
     rosidl_message_type_support_t getMsgTypeSupport();
     rosidl_service_type_support_t getSrvTypeSupport();
     bool isService();
 
     void setID(int id);
-    void setService(void *request, void *response);
 };
 
 #endif // GENERALTOPIC_H

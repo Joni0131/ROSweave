@@ -8,7 +8,7 @@
     "components": [
       {
         "type": "Servo",
-        "name": "Servo?54",
+        "name": "Servo_54",
         "pins": [
           {
             "number": 4,
