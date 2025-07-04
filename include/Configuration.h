@@ -6,7 +6,9 @@
 #include <ArduinoJson.h>
 #include <map>
 #include <string>
+
 #include "ServoMotor.h"
+#include "HC-SR04.h"
 
 #include "GeneralRosDefinitions.h"
 #include "GeneralTopic.h"
@@ -48,6 +50,7 @@ private:
     bool initSPIFFS();
     bool createComponent(const char *type, const char *name, JsonObject &component);
     bool createComponentServo(const char *name, JsonObject &component);
+    bool createComponentHC_SR04(const char *name, JsonObject &component);
 
 public:
     Configuration(const char *node_name, int spintime_ms, int max_publishers, int max_services, int max_subscribers);

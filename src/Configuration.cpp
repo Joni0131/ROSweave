@@ -198,6 +198,10 @@ bool Configuration::createComponent(const char *type, const char *name, JsonObje
     {
         return createComponentServo(name, component);
     }
+    else if (strcmp(type, "HC_SR04") == 0)
+    {
+        return createComponentHC_SR04(name, component);
+    }
     else if (strcmp(type, "IMU") == 0)
     {
         return false; // createComponentIMU(name, component);
@@ -221,5 +225,19 @@ bool Configuration::createComponentServo(const char *name, JsonObject &component
     this->addComponent(name, servoResult.servo);
     this->addTopic(servoResult.targetTopic->getName(), servoResult.targetTopic);
     this->addTopic(servoResult.infoTopic->getName(), servoResult.infoTopic);
+    return true;
+}
+
+bool Configuration::createComponentHC_SR04(const char *name, JsonObject &component)
+{
+    HC_SR04::HC_SR04FactoryResult result = HC_SR04::createFromJsonHC_SR04(name, component, this->publishers);
+    if (result.sensor == nullptr || result.infoTopic == nullptr)
+    {
+        Serial.printf("[createComponentHC_SR04] Failed to create HC_SR04 '%s'.\n", name);
+        return false;
+    }
+
+    this->addComponent(name, result.sensor);
+    this->addTopic(result.infoTopic->getName(), result.infoTopic);
     return true;
 }

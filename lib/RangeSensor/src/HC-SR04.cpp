@@ -44,7 +44,7 @@ HC_SR04::~HC_SR04()
 
 void HC_SR04::initTopics()
 {
-    sensor_msgs__msg__Range *range_msg = (sensor_msgs__msg__Range *)this->infoTopic.getMsg();
+    sensor_msgs__msg__Range *range_msg = (sensor_msgs__msg__Range *)this->infoTopic->getMsg();
 
     range_msg->radiation_type = 0;           // Assuming 0 for ultrasonic
     range_msg->field_of_view = 0.5235987756; // Is 30° for the HC-SR04 => 30 degrees in radians
@@ -83,9 +83,45 @@ void HC_SR04::registerCallbacks()
                                         { this->infoCallback(timer, currentTime); });
 }
 
-HC_SR04 *HC_SR04::createFromJsonHC_SR04(
+HC_SR04::HC_SR04FactoryResult HC_SR04::createFromJsonHC_SR04(
     const char *name,
     JsonObject &component,
     MicroRosPublishers *publishers)
 {
+    HC_SR04FactoryResult result = {nullptr, nullptr};
+
+    Serial.printf("[createComponentHC-SR04] Called for name: %s\n", name);
+    std::string infoTopicName = std::string(name) + "_info";
+    Serial.printf("[createComponentHC-SR04] infoTopicName: %s\n", infoTopicName.c_str());
+
+    // Extract the update interval
+    int updateInterval = component["config"]["topicUpdateInterval"].as<int>();
+    Serial.printf("[createComponentHC-SR04] updateInterval: %d\n", updateInterval);
+
+    // Initialize topics
+    Serial.println("[createComponentHC-SR04] Initializing topics...");
+    result.infoTopic = new GeneralTopic(
+        const_cast<char *>(infoTopicName.c_str()), infoTopicName.size() + 1, sizeof(sensor_msgs__msg__Range), updateInterval, *rosidl_typesupport_c__get_message_type_support_handle__sensor_msgs__msg__Range());
+    Serial.println("[createComponentHC-SR04] Topics initialized.");
+
+    // Extract pin configuration
+    JsonArray pinArray = component["pins"];
+    Serial.printf("[createComponentHC-SR04] pinArray size: %d\n", pinArray.size());
+    std::vector<PinConfiguration> pin_config;
+    for (int i = 0; i < pinArray.size(); i++)
+    {
+        PinConfiguration pin;
+        pin.pin = pinArray[i]["number"];
+        pin.mode = 0;
+        pin.value = 0;
+        pin_config.push_back(pin);
+        Serial.printf("[createComponentHC-SR04] Pin %d: pin=%d, mode=%d, value=%d\n", i, pin.pin, pin.mode, pin.value);
+    }
+
+    // Create and initialize the HC_SR04
+    Serial.println("[createComponentHC-SR04] Creating HC_SR04 instance...");
+    result.sensor = new HC_SR04(&pin_config, result.infoTopic, publishers);
+    Serial.printf("[createComponentHC-SR04] HC_SR04 '%s' initialized.\n", name);
+
+    return result;
 }

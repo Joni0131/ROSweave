@@ -325,6 +325,46 @@ class SensorComponent extends Component {
     }
 }
 
+class HC_SR04Component extends Component {
+    constructor(name) {
+        super('HC_SR04', name);
+    }
+
+        getConfigHtml() {
+        return `
+            ${super.getConfigHtml()}
+            <div class="config-field">
+                <label> Trigger Pin:</label>
+                ${this.renderPinSelector('trigger')}
+            </div>
+            <div class="config-field">
+                <label> Echo Pin:</label>
+                ${this.renderPinSelector('echo')}
+            </div>
+        `;
+    }
+    
+    renderPinSelector(capability) {
+        const pin = this.pins.find(p => p.capability === capability);
+        
+        if (pin) {
+            return `
+                <div>
+                    <span>${pin.name} (GPIO${pin.number})</span>
+                    <button class="remove-pin" data-pin-number="${pin.number}">Remove</button>
+                </div>
+            `;
+        } else {
+            return '<div>No pin selected. Please select a pin from the PWM Pins list.</div>';
+        }
+    }
+
+    isCapabilityValid(capability) {
+        return capability === 'gpio';
+    }
+}
+    
+
 /* @tweakable the component factory settings */
 const componentFactory = {
     createComponent: function(type, name) {
@@ -339,6 +379,8 @@ const componentFactory = {
                 return new ButtonComponent(name);
             case 'Sensor':
                 return new SensorComponent(name);
+            case 'HC_SR04':
+                return new HC_SR04Component(name);
             default:
                 return new Component(type, name);
         }

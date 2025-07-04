@@ -28,12 +28,18 @@ private:
     void registerCallbacks();
 
 public:
+
+    struct HC_SR04FactoryResult {
+        HC_SR04 *sensor;
+        GeneralTopic *infoTopic;
+    };
+
     HC_SR04(std::vector<PinConfiguration> *pin_config, GeneralTopic *infoTopic, MicroRosPublishers *publishers);
     ~HC_SR04();
 
     void infoCallback(rcl_timer_t *timer, int64_t last_call_time);
 
-    static HC_SR04 *createFromJsonHC_SR04(
+    static HC_SR04FactoryResult createFromJsonHC_SR04(
         const char *name,
         JsonObject &component,
         MicroRosPublishers *publishers
